@@ -16,6 +16,20 @@ class SimpleCouchbase {
         }
     }
 
+    public function createBucket($bucket, $attributes)
+    {
+        try {
+            $this->cluster->createBucket($bucket, $attributes);
+
+        } catch (\CouchbaseException $e) {
+            echo $e->getCode()."\n";
+            echo $e->getMessage()."\n";
+
+            return false;
+        }
+
+    }
+
     public function openBucket($bucket)
     {
         try {
@@ -53,7 +67,9 @@ class SimpleCouchbase {
 
             foreach ($value as $k => $v) {
                 if (is_string($v)) {
-                    $value[$k] = utf8_encode($v);
+                    if (mb_detect_encoding($v) != 'UTF-8') {
+                        $value[$k] = utf8_encode($v);
+                    }
                 }
             }
 

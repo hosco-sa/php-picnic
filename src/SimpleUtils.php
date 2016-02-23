@@ -86,4 +86,96 @@ class SimpleUtils {
         return implode(" ", $arRet);
     }
 
+    /**
+     * @param array $array
+     * @param $column
+     * @param array $values
+     * @param bool $notIn
+     * @return array
+     */
+    public static function array_filter_values(array $array, $column, array $values, $notIn = false)
+    {
+        sort($values);
+
+        return array_filter($array, function($item) use ($column, $values, $notIn) {
+            return ($notIn xor (Utils::binary_search($item[$column], $values) !== false));
+        });
+    }
+
+    /**
+     * @param array $array
+     * @param callable $callback
+     * @param array $keys
+     */
+    public static function call_func_array(array &$array, callable $callback, array $keys = array())
+    {
+        $auxArray = empty($keys) ? $array : array_intersect_key($array, array_flip($keys));
+
+        foreach ($auxArray as $key => $value) {
+            $array[$key] = call_user_func($callback, $value);
+        }
+    }
+
+    /**
+     * @param array $array
+     * @param $field
+     * @param bool $reverse
+     */
+    public static function usort_by_array_field(array &$array, $field, $reverse = false)
+    {
+        uasort($array, function($item1, $item2) use ($field, $reverse) {
+            return (($reverse xor $item1[$field] < $item2[$field]) ? -1 : 1);
+        });
+    }
+
+    /**
+     * @param array $array
+     * @param $column
+     * @param array $values
+     * @return array
+     */
+    public static function array_intersect_column(array $array, $column, array $values)
+    {
+        $colA = array_flip(array_column($array, $column));
+        $colB = array_flip($values);
+
+        $intersect = array_intersect_key($colA, $colB);
+
+        return array_intersect_key($array, array_flip($intersect));
+    }
+
+    public static function curl_image($url, $file)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+        $rawdata = curl_exec ($ch);
+        curl_close ($ch);
+
+        $fp = fopen($file,'w');
+        fwrite($fp, $rawdata);
+        fclose($fp);
+    }
+
+    public static function curl_request($url, $type="GET", $json=false)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+        $rawdata = curl_exec ($ch);
+        curl_close ($ch);
+
+        return $rawdata;
+    }
 }

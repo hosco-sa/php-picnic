@@ -519,5 +519,3 @@ class SimpleMysql {
     }
 
 }
-
-?>

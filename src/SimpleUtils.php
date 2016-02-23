@@ -4,12 +4,19 @@ namespace Picnic;
 
 class SimpleUtils {
 
-    public static function UUID()
+    /**
+     * @return string
+     */
+    public static function new_uuid()
     {
         return strtolower(sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0,65535), mt_rand(0,65535), mt_rand(0,65535), mt_rand(16384,20479), mt_rand(32768,49151), mt_rand(0,65535), mt_rand(0,65535), mt_rand(0,65535)));
     }
 
-    public static function md5ToUUID($md5)
+    /**
+     * @param $md5
+     * @return string
+     */
+    public static function md5_to_uuid($md5)
     {
         return strtolower(substr($md5,0,8)."-".substr($md5,8,4)."-".substr($md5,12,4)."-".substr($md5,16,4)."-".substr($md5,20,12));
     }
@@ -55,6 +62,10 @@ class SimpleUtils {
         return (json_last_error() == JSON_ERROR_NONE);
     }
 
+    /**
+     * @param $num
+     * @return string
+     */
     public static function random_words($num)
     {
         $dictionary = "/usr/share/dict/words";
@@ -74,4 +85,5 @@ class SimpleUtils {
 
         return implode(" ", $arRet);
     }
+
 }

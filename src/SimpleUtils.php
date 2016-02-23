@@ -54,4 +54,24 @@ class SimpleUtils {
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);
     }
+
+    public static function random_words($num)
+    {
+        $dictionary = "/usr/share/dict/words";
+
+        $arWords = file($dictionary);
+
+        $n = 0;
+
+        $arRet = array();
+
+        while ($n < $num) {
+            $random = rand(0,235885);
+            $arRet[] = rtrim($arWords[$random]);
+
+            $n++;
+        }
+
+        return implode(" ", $arRet);
+    }
 }

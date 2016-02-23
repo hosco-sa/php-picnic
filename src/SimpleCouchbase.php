@@ -9,7 +9,7 @@ class SimpleCouchbase {
 
     public function __construct($params)
     {
-        $this->cluster = new \CouchbaseCluster('couchbase://'.$params['host']);
+        $this->cluster = new \CouchbaseCluster('http://'.$params['host'].'?detailed_errcodes=1');
 
         if ($params['bucket']) {
             $this->openBucket($params['bucket']);
@@ -35,7 +35,6 @@ class SimpleCouchbase {
         try {
 
             $res = $this->bucket->get($key);
-
             return $res;
 
         } catch (\CouchbaseException $e) {
@@ -52,26 +51,18 @@ class SimpleCouchbase {
     {
         try {
 
-            if ($key == 'ES_catalog_8007f54b') {
-                print_r($value);
-
-                foreach ($value as $k => $v) {
-                    if (is_string($v)) {
-                        $value[$k] = utf8_encode($v);
-                    }
+            foreach ($value as $k => $v) {
+                if (is_string($v)) {
+                    $value[$k] = utf8_encode($v);
                 }
+            }
 
-                $json = json_encode($value);
+            $json = json_encode($value);
 
-                echo $json;
+            if (SimpleUtils::is_json($json)) {
+                $res = $this->bucket->upsert($key, $value);
 
-                if (SimpleUtils::is_json($json)) {
-                    $res = $this->bucket->upsert($key, $value);
-
-                    print_r($res);
-
-                    die;
-                }
+                return $res;
             }
 
         } catch (\CouchbaseException $e) {

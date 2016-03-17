@@ -66,12 +66,56 @@ class SimpleS3 {
     public function pollObject($bucket, $key)
     {
         // We can poll the object until it is accessible
-        $res = $this->client->waitUntil('ObjectExists', array(
+        $result = $this->client->waitUntil('ObjectExists', array(
             'Bucket' => $bucket,
             'Key'    => $key
         ));
 
-        return $res;
+        return $result;
+    }
+
+    public function deleteObject($bucket, $key)
+    {
+        $result = $this->client->deleteObject(array(
+            'Bucket' => $bucket,
+            'Key'    => $key
+        ));
+
+        return $result;
+    }
+
+    public function truncateBucket($bucket)
+    {
+        $iterator = $this->client->getIterator('ListObjects', array(
+            'Bucket' => $bucket,
+            'Prefix' => ""
+        ));
+
+        foreach ($iterator as $object) {
+            $completeS3path = "s3://".$bucket."/".$object['Key'];
+
+            echo $completeS3path."\n";
+
+            $this->client->registerStreamWrapper();
+
+            echo $object['Key']."\n";
+
+            $keyExists = file_exists("s3://$bucket/".$object['Key']);
+
+            if ($keyExists) {
+                // Get an object using the getObject operation
+                $content = $this->client->getObject(array(
+                    'Bucket' => $bucket,
+                    'Key'    => $object['Key']
+                ));
+            }
+
+            $res = $this->deleteObject($bucket, $object['Key']);
+
+            if ($res) {
+                // print_r($res);
+            }
+        }
     }
 
 }

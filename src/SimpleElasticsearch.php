@@ -59,31 +59,32 @@ class SimpleElasticsearch {
         return $this->client->get($params);
     }
 
+    public function delete($index, $id, $type=0)
+    {
+        $params = [
+            'index' => $index,
+            'type' => $type,
+            'id' => $id
+        ];
+
+        return $this->client->delete($params);
+    }
+
     public function search($index, $body, $type=0)
     {
         $params = [
             'index' => $index,
             'type' => $type,
-            'body' => [
-                'query' => [
-                    'match' => [
-                        'testField' => 'abc'
-                    ]
-                ]
-            ]
+            'body' => $body
         ];
 
         return $this->client->search($params);
     }
 
-    public function delete()
+    public function truncateIndex($index)
     {
-        $params = [
-            'index' => 'my_index',
-            'type' => 'my_type',
-            'id' => 'my_id'
-        ];
+        $this->deleteIndex($index);
 
-        return $this->client->delete($params);
+        return $this->createIndex($index, 5, 1);
     }
 }

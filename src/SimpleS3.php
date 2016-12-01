@@ -36,6 +36,18 @@ class SimpleS3 {
 
     }
 
+    public function copyObject($bucketOrigin, $keyOrigin, $bucketDestination, $keyDestination)
+    {
+        // Copy an object
+        $result = $this->client->copyObject(array(
+            'Bucket'     => $bucketDestination,
+            'Key'        => $keyDestination,
+            'CopySource' => "{$bucketOrigin}/{$keyOrigin}",
+        ));
+        
+        return $result;
+    }
+
     public function putObject($bucket, $key, $body)
     {
         // Upload an object to Amazon S3

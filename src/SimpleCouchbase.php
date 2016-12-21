@@ -9,10 +9,11 @@ class SimpleCouchbase {
 
     public function __construct($params)
     {
-        $this->cluster = new \CouchbaseCluster('http://'.$params['host'].'?detailed_errcodes=1');
+        $this->cluster = new \CouchbaseCluster("couchbase://".$params['host']);
 
         if ($params['bucket']) {
-            $this->openBucket($params['bucket']);
+            $this->bucket = $params['bucket'];
+            $this->cluster->openBucket($this->bucket);
         }
     }
 
@@ -30,25 +31,11 @@ class SimpleCouchbase {
 
     }
 
-    public function openBucket($bucket)
-    {
-        try {
-            $this->bucket = $this->cluster->openBucket($bucket);
-
-        } catch (\CouchbaseException $e) {
-            echo $e->getCode()."\n";
-            echo $e->getMessage()."\n";
-
-            return false;
-        }
-
-    }
-
     public function getDocument($key)
     {
         try {
 
-            $res = $this->bucket->get($key);
+            $res = $this->cluster->openBucket($this->bucket)->get($key);
             return $res;
 
         } catch (\CouchbaseException $e) {
@@ -76,7 +63,8 @@ class SimpleCouchbase {
             $json = json_encode($value);
 
             if (SimpleUtils::is_json($json)) {
-                $res = $this->bucket->upsert($key, $value);
+
+                $res = $this->cluster->openBucket($this->bucket)->upsert($key, $value);
 
                 return $res;
             }

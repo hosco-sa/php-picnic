@@ -178,4 +178,33 @@ class SimpleUtils {
 
         return $rawdata;
     }
+
+    /**
+     * @param $url
+     * @return int
+     */
+    public static function up_check($url)
+    {
+        $up = 0;
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_VERBOSE, 0);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        $response = curl_exec($ch);
+
+        if ($response) {
+            $up = 1;
+        }
+
+        // Then, after your curl_exec call:
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $header_size);
+        $body = substr($response, $header_size);
+
+        return $up;
+    }
+
 }

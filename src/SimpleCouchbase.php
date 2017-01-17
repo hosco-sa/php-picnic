@@ -77,4 +77,47 @@ class SimpleCouchbase {
             return false;
         }
     }
+
+    public function setPartialDocument($key, $value)
+    {
+        try {
+
+            $res = $this->cluster->openBucket($this->bucket)->get($key);
+
+            $arOld = json_decode($res->value, true);
+
+            $arNew = json_decode($value, true);
+
+            // print_r($arOld);
+
+            if (isset($arNew['uuid'])) unset($arNew['uuid']);
+            if (isset($arNew['entity'])) unset($arNew['entity']);
+            if (isset($arNew['created_at'])) unset($arNew['created_at']);
+            if (isset($arNew['modified_at'])) unset($arNew['modified_at']);
+
+            // print_r($arNew);
+
+            $arMerged = array_merge($arOld, $arNew);
+
+            // print_r($arMerged);
+
+            $json = json_encode($arMerged);
+
+            if (SimpleUtils::is_json($json)) {
+
+                $res = $this->cluster->openBucket($this->bucket)->upsert($key, $json);
+
+                if (!$res->error) {
+                    return $res;
+                }
+            }
+
+        } catch (\CouchbaseException $e) {
+
+            echo $e->getCode()."\n";
+            echo $e->getMessage()."\n";
+
+            return false;
+        }
+    }
 }

@@ -207,4 +207,22 @@ class SimpleUtils {
         return $up;
     }
 
+    public static function pass_hash($password)
+    {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        // echo $hash."\n";
+        
+        return $hash;
+    }
+
+    public static function pass_check($hash, $password)
+    {
+        if (password_verify($password, $hash)) {
+            // echo 'Password is valid!';
+            return true;
+        } else {
+            // echo 'Invalid password.';
+            return false;
+        }
+    }
 }

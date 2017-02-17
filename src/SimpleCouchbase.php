@@ -77,7 +77,7 @@ class SimpleCouchbase {
 
             $res = $this->cluster->openBucket($this->bucket)->get($key);
 
-            $arOld = json_decode($res->value, true);
+            $arOld = (array) $res->value;
 
             $arNew = json_decode($value, true);
 

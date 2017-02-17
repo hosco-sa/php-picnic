@@ -23,10 +23,9 @@ class SimpleCouchbase {
             $this->cluster->createBucket($bucket, $attributes);
 
         } catch (\CouchbaseException $e) {
-            echo $e->getCode()."\n";
-            echo $e->getMessage()."\n";
-
+            echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
+
         }
 
     }
@@ -34,15 +33,11 @@ class SimpleCouchbase {
     public function getDocument($key)
     {
         try {
-
             $res = $this->cluster->openBucket($this->bucket)->get($key);
             return $res;
 
         } catch (\CouchbaseException $e) {
-
-            echo $e->getCode()."\n";
-            echo $e->getMessage()."\n";
-
+            echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
 
         }
@@ -70,11 +65,9 @@ class SimpleCouchbase {
             }
 
         } catch (\CouchbaseException $e) {
-
-            echo $e->getCode()."\n";
-            echo $e->getMessage()."\n";
-
+            echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
+
         }
     }
 
@@ -113,11 +106,26 @@ class SimpleCouchbase {
             }
 
         } catch (\CouchbaseException $e) {
-
-            echo $e->getCode()."\n";
-            echo $e->getMessage()."\n";
-
+            echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
+
         }
     }
+    
+    public function delDocument($key)
+    {
+        try {
+            $res = $this->cluster->openBucket($this->bucket)->remove($key);
+
+            if (!$res->error) {
+                return $res;
+            }
+
+        } catch (\CouchbaseException $e) {
+            echo $e->getCode()." ".$e->getMessage()."\n";
+            return false;
+
+        }
+    }
+    
 }

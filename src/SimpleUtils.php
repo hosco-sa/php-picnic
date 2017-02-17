@@ -215,7 +215,7 @@ class SimpleUtils {
         return $hash;
     }
 
-    public static function pass_check($hash, $password)
+    public static function pass_check($password, $hash)
     {
         if (password_verify($password, $hash)) {
             // echo 'Password is valid!';

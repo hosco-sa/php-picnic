@@ -77,7 +77,11 @@ class SimpleCouchbase {
 
             $res = $this->cluster->openBucket($this->bucket)->get($key);
 
-            $arOld = (array) $res->value;
+            if (is_object($res->value)) {
+                $arOld = (array) $res->value;
+            } else {
+                $arOld = json_decode($res->value, true);
+            }
 
             $arNew = json_decode($value, true);
 
@@ -94,10 +98,9 @@ class SimpleCouchbase {
 
             // print_r($arMerged);
 
-            $json = json_encode($arMerged);
+            $json = stripslashes(json_encode($arMerged));
 
             if (SimpleUtils::is_json($json)) {
-
                 $res = $this->cluster->openBucket($this->bucket)->upsert($key, $json);
 
                 if (!$res->error) {

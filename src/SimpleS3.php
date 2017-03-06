@@ -69,7 +69,7 @@ class SimpleS3 {
             'SourceFile' => $file,
             'ContentType' => $content_type,
             'ACL'          => 'public-read',
-            'StorageClass' => 'REDUCED_REDUNDANCY'
+            'StorageClass' => 'STANDARD'
         ));
 
         return $result;

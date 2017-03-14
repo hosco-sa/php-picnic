@@ -110,7 +110,7 @@ class SimpleMysql {
     {
         $table = $table ? $table : $this->table;
 
-        $sql = "SHOW COLUMNS FROM ".$table;
+        $sql = "SHOW COLUMNS FROM `".$table."`";
         return $this->query($sql);
     }
 

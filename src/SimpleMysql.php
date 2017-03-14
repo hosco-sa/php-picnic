@@ -11,6 +11,8 @@ class SimpleMysql {
     public $password;
     public $database;
 
+    public $table;
+
     public $charset;
 
     /**
@@ -32,7 +34,7 @@ class SimpleMysql {
 
             //$this->link = @mysqli_connect($this->hostname, $this->username, $this->password, $this->database);
             $this->link = mysqli_init();
-            mysqli_options($this->link, MYSQLI_OPT_CONNECT_TIMEOUT, 1);
+            mysqli_options($this->link, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
             if (@mysqli_real_connect($this->link, $this->hostname, $this->username, $this->password, $this->database)) {
                 $names = "SET NAMES '".$this->charset."';";
@@ -54,6 +56,10 @@ class SimpleMysql {
 
     }
 
+    /**
+     * CONNECTED
+     *
+     */
     public function connected()
     {
         return $this->link ? true : false;
@@ -68,6 +74,10 @@ class SimpleMysql {
 
     }
 
+    /**
+     * ESCAPE String
+     *
+     */
     public function escapeString($string)
     {
         return mysqli_real_escape_string($this->link, $string);
@@ -84,10 +94,10 @@ class SimpleMysql {
     }
 
     /**
-     * DELETE Database
+     * DROP Database
      *
      */
-    public function deleteDatabase()
+    public function dropDatabase()
     {
 
     }
@@ -96,8 +106,10 @@ class SimpleMysql {
      * GET Columns
      *
      */
-    public function getColumns($table)
+    public function getColumns($table = null)
     {
+        $table = $table ? $table : $this->table;
+
         $sql = "SHOW COLUMNS FROM ".$table;
         return $this->query($sql);
     }
@@ -115,8 +127,10 @@ class SimpleMysql {
      * GET NextInsertID
      *
      */
-    public function getNextInsertID($table)
+    public function getNextInsertID($table = null)
     {
+        $table = $table ? $table : $this->table;
+
         // $sql = "SELECT ".$table."_id+1 as next_id FROM ".$this->database.".$table WHERE 1 ORDER BY 1 DESC LIMIT 0,1;";
         $sql = "SELECT Auto_increment as next_id FROM information_schema.tables WHERE table_name='".$table."';";
         //$sql = "SELECT COUNT(*)+1 as next_id FROM `".$table."`;";
@@ -129,8 +143,10 @@ class SimpleMysql {
      * CREATE Row
      *
      */
-    public function createRow($table, $params, $replace = false)
+    public function createRow($params, $replace = false, $table = null)
     {
+        $table = $table ? $table : $this->table;
+
         $columns = $this->getColumns($table);
 
         foreach ($columns as $column) {
@@ -141,8 +157,10 @@ class SimpleMysql {
 
         if ($params)
             foreach ($params as $key => $value) {
+                $value = is_array($value) ? json_encode($value) : $value;
+
                 if (strstr($key, "eav_")) {
-                    $eav[$key] = (is_array($value)) ? json_encode($value) : $value;
+                    $eav[$key] = $value;
                 } else if (!in_array($key, $arColumns)) {
                     $eav[$key] = $value;
                 } else {
@@ -167,8 +185,14 @@ class SimpleMysql {
         return $lastId;
     }
 
-    public function insertReplaceRow($table, $data)
+    /**
+     * INSERT Replace Row
+     *
+     */
+    public function insertReplaceRow($data, $table = null)
     {
+        $table = $table ? $table : $this->table;
+
         $queryBuilder = "REPLACE INTO $table (%s) VALUES (%s)";
 
         $columns = join(",", array_keys($data));
@@ -195,7 +219,7 @@ class SimpleMysql {
      * READ Row
      *
      */
-    public function readRow($id, $table = false)
+    public function readRow($id, $table = null)
     {
         $table = $table ? $table : $this->table;
 
@@ -203,6 +227,10 @@ class SimpleMysql {
         return $this->query($sql);
     }
 
+    /**
+     * READ By Keys
+     *
+     */
     public function readByKeys($table, $keys)
     {
         $query = "SELECT * FROM $table WHERE 1";
@@ -217,8 +245,10 @@ class SimpleMysql {
      * COUNTS Rows
      *
      */
-    public function countRows($table, $priority=0)
+    public function countRows($priority=0, $table = null)
     {
+        $table = $table ? $table : $this->table;
+
         if ($priority > 0) {
             $sql = "SELECT COUNT(*) as total_rows FROM ".$this->database.".".$table." WHERE 1 AND priority >= $priority";
         } else {
@@ -230,11 +260,13 @@ class SimpleMysql {
     }
 
     /**
-     * COUNTS Rows
+     * COUNTS Rows From
      *
      */
-    public function countRowsFrom($table, $id, $keyColumn = null)
+    public function countRowsFrom($id, $keyColumn = null, $table = null)
     {
+        $table = $table ? $table : $this->table;
+
         $keyColumn = $keyColumn ? $keyColumn : ($table . '_id');
         $sql = "SELECT COUNT(*) as total_rows FROM $table WHERE $keyColumn >= '{$id}'";
 
@@ -247,8 +279,10 @@ class SimpleMysql {
      * COUNTS Active Rows
      *
      */
-    public function countActiveRows($table)
+    public function countActiveRows($table = null)
     {
+        $table = $table ? $table : $this->table;
+
         $sql = "SELECT COUNT(*) as total_rows FROM ".$table." WHERE 1 AND active='Y'";
         $rows = $this->query($sql);
         return $rows[0]['total_rows'];
@@ -258,8 +292,10 @@ class SimpleMysql {
      * COUNTS Active Rows
      *
      */
-    public function countActiveRowsFrom($table, $id)
+    public function countActiveRowsFrom($id, $table = null)
     {
+        $table = $table ? $table : $this->table;
+
         $sql = "SELECT COUNT(*) as total_rows FROM ".$this->database.".".$table." WHERE " . $table . "_id >= '" . $id  . "' AND active='Y'";
         $rows = $this->query($sql);
         return $rows[0]['total_rows'];
@@ -269,8 +305,10 @@ class SimpleMysql {
      * COUNTS Non Active Rows
      *
      */
-    public function countNonActiveRows($table)
+    public function countNonActiveRows($table = null)
     {
+        $table = $table ? $table : $this->table;
+
         $sql = "SELECT COUNT(*) as total_rows FROM ".$this->database.".".$table." WHERE 1 AND active='N'";
         $rows = $this->query($sql);
         return $rows[0]['total_rows'];
@@ -293,12 +331,13 @@ class SimpleMysql {
     }
 
     /**
-     * READ ALL Rows
+     * READ ALL Rows From
      *
      */
-    public function readAllRowsFrom($entityId = '0', $size = 30000000, $table = null, $keyColumn = null)
+    public function readAllRowsFrom($entityId = '0', $size = 30000000, $keyColumn = null, $table = null)
     {
         $table = !$table ? $this->table : $table;
+
         $keyColumn = $keyColumn ? $keyColumn : $table . '_id';
 
         $sql = "SELECT * FROM " . $table . " WHERE $keyColumn > '$entityId' LIMIT $size";
@@ -308,10 +347,7 @@ class SimpleMysql {
 
     /**
      * READ ALL Active Rows
-     * @param int $start
-     * @param int $size
-     * @param $table
-     * @return array|bool|mysqli_result|string
+     * 
      */
     public function readAllActiveRows($start=0, $size=10000000, $table = null)
     {
@@ -321,9 +357,14 @@ class SimpleMysql {
         return $this->query($sql);
     }
 
+    /**
+     * READ Rows From
+     *
+     */
     public function readRowsFrom($entityId, $size = 10000, $table = null)
     {
         $table = !$table ? $this->table : $table;
+
         $field = $table . '_id';
 
         $sql = "SELECT *
@@ -336,9 +377,14 @@ class SimpleMysql {
         return $this->query($query, true);
     }
 
+    /**
+     * READ All Active Rows From
+     *
+     */
     public function readAllActiveRowsFrom($entityId, $size = 10000, $table = null)
     {
         $table = !$table ? $this->table : $table;
+
         $field = $table . '_id';
 
         $sql = "SELECT *
@@ -355,9 +401,11 @@ class SimpleMysql {
      * READ ALL Non Active Rows
      *
      */
-    public function readAllNonActiveRows($start=0, $size=10000000)
+    public function readAllNonActiveRows($start=0, $size=10000000, $table = null)
     {
-        $sql = "SELECT * FROM ".$this->database.".".$this->table." WHERE 1 AND active='N' LIMIT $start, $size";
+        $table = !$table ? $this->table : $table;
+
+        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND active='N' LIMIT $start, $size";
         return $this->query($sql);
     }
 
@@ -365,8 +413,10 @@ class SimpleMysql {
      * READ Eav
      *
      */
-    public function readEav($table, $id, $filters=false)
+    public function readEav($id, $filters=false, $table = null)
     {
+        $table = !$table ? $this->table : $table;
+
         $and = "";
 
         if ($filters) {
@@ -384,9 +434,11 @@ class SimpleMysql {
      * READ All Eav
      *
      */
-    public function readAllEav($id)
+    public function readAllEav($id, $table = null)
     {
-        $sql = "SELECT * FROM ".$this->database.".".$this->table."_eav WHERE 1 AND ".$this->table."_id = $id";
+        $table = !$table ? $this->table : $table;
+
+        $sql = "SELECT * FROM ".$this->database.".".$table."_eav WHERE 1 AND ".$table."_id = $id";
         // echo $sql;
         return $this->query($sql);
     }
@@ -395,8 +447,10 @@ class SimpleMysql {
      * READ All Other
      *
      */
-    public function readAllSecondary($id, $secondary, $interval = array(), $onlyActive = false)
+    public function readAllSecondary($id, $secondary, $interval = array(), $onlyActive = false, $table = null)
     {
+        $table = !$table ? $this->table : $table;
+
         $interval_where = '';
         if (!empty($interval)) {
             $interval_where = "AND {$interval['date_field']} > (CURRENT_DATE - INTERVAL {$interval['quantity']} {$interval['unit']})";
@@ -407,13 +461,19 @@ class SimpleMysql {
             $active = "AND active = 'Y'";
         }
 
-        $sql = "SELECT * FROM {$this->database}.{$this->table}_{$secondary} WHERE 1 AND {$this->table}_id = '$id' $active $interval_where ORDER BY 1 DESC";
+        $sql = "SELECT * FROM {$this->database}.{$table}_{$secondary} WHERE 1 AND {$table}_id = '$id' $active $interval_where ORDER BY 1 DESC";
         // echo $sql;
         return $this->query($sql);
     }
 
-    public function readSecondaryData($table, $keyColumn, $keyValue, $selectColumns = array(), $onlyActive = false)
+    /**
+     * READ Secondary Data
+     *
+     */
+    public function readSecondaryData($table, $keyColumn, $keyValue, $selectColumns = array(), $onlyActive = false, $table = null)
     {
+        $table = !$table ? $this->table : $table;
+
         $sqlSelect = join(',', $selectColumns);
         $sqlSelect = empty($sqlSelect) ? '*' : $sqlSelect;
 
@@ -424,11 +484,13 @@ class SimpleMysql {
     }
 
     /**
-     * COUNTS Rows
+     * COUNTS Updated Rows
      *
      */
-    public function countUpdatedRows($table, $minute)
+    public function countUpdatedRows($minute, $table = null)
     {
+        $table = !$table ? $this->table : $table;
+
         $sql = "SELECT COUNT(*) as total_rows FROM ".$this->database.".".$table." WHERE 1 AND updated_at > DATE_SUB( NOW() , INTERVAL $minute MINUTE )";
         $rows = $this->query($sql);
         if (isset($rows[0]['total_rows'])) {
@@ -442,9 +504,11 @@ class SimpleMysql {
      * READ Updated Rows
      *
      */
-    public function readUpdatedRows($minute, $start=false, $size=false)
+    public function readUpdatedRows($minute, $start=false, $size=false, $table = null)
     {
-        $sql = "SELECT * FROM ".$this->database.".".$this->table." WHERE 1 AND updated_at > DATE_SUB( NOW() , INTERVAL $minute MINUTE ) LIMIT $start, $size";
+        $table = !$table ? $this->table : $table;
+
+        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND updated_at > DATE_SUB( NOW() , INTERVAL $minute MINUTE ) LIMIT $start, $size";
         return $this->query($sql);
     }
 
@@ -452,41 +516,44 @@ class SimpleMysql {
      * UPDATE Row
      *
      */
-    public function updateRow($params)
+    public function updateRow($id, $params, $table = null)
     {
-        $id = $params['id'];
-
-        unset($params['id']);
+        $table = !$table ? $this->table : $table;
 
         foreach ($params as $key => $value) {
-            $sql = "UPDATE ".$this->database.".".$this->table." SET $key = '$value' WHERE ".$this->table."_id = $id";
+            $sql = "UPDATE ".$this->database.".".$table." SET $key = '$value' WHERE ".$table."_id = $id";
             // echo $sql."\n";
             $this->query($sql);
         }
     }
 
     /**
-     * UPDATE Row
-     *
-     */
-    public function updateUUID($table, $id)
-    {
-        $database = (isset($this->database) ? $this->database : 'admin_cit');
-
-        $sql = "UPDATE $database.$table SET uuid = 'ES_${table}_${id}' WHERE ${table}_id = $id";
-        // echo $sql."\n";
-        $this->query($sql);
-    }
-
-    /**
      * DELETE Row
      *
      */
-    public function deleteRow()
+    public function deleteRow($id, $table = null)
     {
+        $table = !$table ? $this->table : $table;
 
+        $sql = "DELETE FROM ".$this->database.".".$table." WHERE ".$table."_id = $id LIMIT 1";
+        // echo $sql."\n";
+        return $this->query($sql);
     }
 
+    /**
+     * GET Next Auto Increment Id
+     *
+     */
+    public function getNextAutoIncrementId($table = null)
+    {
+        $table = !$table ? $this->table : $table;
+
+        $sql = "SELECT Auto_increment
+                FROM information_schema.tables
+                WHERE table_name = '".$table."'";
+        $this->query($sql);
+    }
+    
     /**
      * QUERY
      *

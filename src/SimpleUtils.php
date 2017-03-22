@@ -164,8 +164,8 @@ class SimpleUtils {
     public static function curl_request($url, $type="GET", $json=false)
     {
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
@@ -173,6 +173,24 @@ class SimpleUtils {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+        $rawdata = curl_exec ($ch);
+        curl_close ($ch);
+
+        return $rawdata;
+    }
+
+    public static function curl_request_xml($url, $type="GET", $xml=false)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml'));
         $rawdata = curl_exec ($ch);
         curl_close ($ch);
 

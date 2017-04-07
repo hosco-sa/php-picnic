@@ -553,6 +553,18 @@ class SimpleMysql {
                 WHERE table_name = '".$table."'";
         $this->query($sql);
     }
+
+    /**
+     * READ By Attribute Value
+     *
+     */
+    public function readByAttributeValue($att, $val, $table = null)
+    {
+        $table = !$table ? $this->table : $table;
+
+        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND `$att` LIKE '%$val%'";
+        return $this->query($sql);
+    }
     
     /**
      * QUERY

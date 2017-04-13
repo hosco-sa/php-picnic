@@ -13,7 +13,7 @@ class SimpleMysql {
 
     public $table;
 
-    public $charset;
+    public $charset = 'utf8';
 
     /**
      * @param object $link
@@ -30,9 +30,7 @@ class SimpleMysql {
 
         } else if (!empty($options)) {
             if (isset($this->host)) $this->hostname = $this->host;
-            if (isset($this->dbname)) $this->database = $this->dbname;
 
-            //$this->link = @mysqli_connect($this->hostname, $this->username, $this->password, $this->database);
             $this->link = mysqli_init();
             mysqli_options($this->link, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
@@ -42,8 +40,9 @@ class SimpleMysql {
 
                 $charset = "SET CHARSET '".$this->charset."';";
                 mysqli_query($this->link, $charset);
-            } else
+            } else {
                 $this->link = false;
+            }
         }
     }
 

@@ -23,7 +23,7 @@ class SimpleCouchbase {
             $this->cluster->createBucket($bucket, $attributes);
 
         } catch (\CouchbaseException $e) {
-            echo $e->getCode()." ".$e->getMessage()."\n";
+            // echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
 
         }
@@ -37,7 +37,7 @@ class SimpleCouchbase {
             return $res;
 
         } catch (\CouchbaseException $e) {
-            echo $e->getCode()." ".$e->getMessage()."\n";
+            // echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
 
         }
@@ -65,7 +65,7 @@ class SimpleCouchbase {
             }
 
         } catch (\CouchbaseException $e) {
-            echo $e->getCode()." ".$e->getMessage()."\n";
+            // echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
 
         }
@@ -109,7 +109,7 @@ class SimpleCouchbase {
             }
 
         } catch (\CouchbaseException $e) {
-            echo $e->getCode()." ".$e->getMessage()."\n";
+            // echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
 
         }
@@ -125,7 +125,7 @@ class SimpleCouchbase {
             }
 
         } catch (\CouchbaseException $e) {
-            echo $e->getCode()." ".$e->getMessage()."\n";
+            // echo $e->getCode()." ".$e->getMessage()."\n";
             return false;
 
         }

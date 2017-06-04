@@ -1,7 +1,7 @@
 {
   "name": "dvpablo/php-picnic",
   "description": "Picnic libraries for PHP services: Mysql, Couchbase, ElasticSearch, S3",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "authors": [
     {
       "name": "Pablo del Vecchio",
@@ -10,10 +10,10 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.3.0",
+    "php": "5.6.*",
     "phpunit/phpunit": "4.*",
     "aws/aws-sdk-php": "2.*",
-    "elasticsearch/elasticsearch": "~2.0"
+    "elasticsearch/elasticsearch": "2.*"
   },
   "autoload": {
     "psr-4": {

@@ -218,11 +218,16 @@ class SimpleMysql {
      * READ Row
      *
      */
-    public function readRow($id, $table = null)
+    public function readRow($id, $table = null, $pk = null)
     {
         $table = $table ? $table : $this->table;
 
-        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$table."_id = '" . $id . "'";
+        if (!$pk) {
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$table."_id = '" . $id . "'";    
+        } else  {
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$pk." = '" . $id . "'";
+        }
+        
         return $this->query($sql);
     }
 
@@ -317,15 +322,16 @@ class SimpleMysql {
      * READ ALL Rows
      *
      */
-    public function readAllRows($start=0, $size=30000000, $priority=0, $table = null)
+    public function readAllRows($start=0, $size=30000000, $priority=0, $table = null, $orderby = null)
     {
         $table = !$table ? $this->table : $table;
 
         if ($priority > 0) {
-            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND priority >= $priority LIMIT $start, $size";
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND priority >= $priority $orderby LIMIT $start, $size";
         } else {
-            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 LIMIT $start, $size";
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 $orderby LIMIT $start, $size";
         }
+
         return $this->query($sql);
     }
 

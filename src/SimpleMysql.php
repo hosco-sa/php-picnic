@@ -185,6 +185,56 @@ class SimpleMysql {
     }
 
     /**
+     * CREATE Row with Eav
+     *
+     */
+    public function createRowwithEav($params, $replace = false, $table = null, $key_id = null)
+    {
+        $table = $table ? $table : $this->table;
+
+        $columns = $this->getColumns($table);
+
+        foreach ($columns as $column) {
+            $arColumns[] = $column['Field'];
+        }
+
+        // print_r($arColumns);
+
+        if ($params)
+            foreach ($params as $key => $value) {
+                $value = is_array($value) ? json_encode($value) : $value;
+
+                if (strstr($key, "eav_")) {
+                    $eav[$key] = $value;
+                } else if (!in_array($key, $arColumns)) {
+                    $eav[$key] = $value;
+                } else {
+                    $keys[] = $key;
+                    $values[] = mysqli_escape_string($this->link, $value);
+                }
+            }
+
+        $sql = ($replace ? "REPLACE" : "INSERT") . " INTO ".$this->database.".".$table." (`".implode('`,`', $keys)."`) VALUES ('".implode("','", $values)."')";
+        // echo $sql."\n";
+        $this->query($sql);
+
+        $lastId = $this->getLastInsertID();
+
+        if (isset($lastId) && $lastId > 0) {
+            if (isset($eav) && $eav) {
+                foreach ($eav as $key => $value) {
+                    $sql =  "INSERT INTO ".$this->database.".".$table."_eav (`".$key_id."`, `Attribute`, `Value`) VALUES ($lastId, '$key', '$value')";
+                    // echo $sql."\n";
+                    $this->query($sql);
+                }
+            }
+
+        }
+
+        return $lastId;
+    }
+
+    /**
      * INSERT Replace Row
      *
      */

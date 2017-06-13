@@ -449,6 +449,17 @@ class SimpleMysql {
     }
 
     /**
+     * READ All Eav Data
+     *
+     */
+    public function readAllEavData($table, $key, $id)
+    {
+        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$key." = $id";
+        // echo $sql;
+        return $this->query($sql);
+    }
+
+    /**
      * READ All Other
      *
      */

@@ -89,8 +89,6 @@ class SimpleCouchbase {
 
             if (isset($arNew['uuid'])) unset($arNew['uuid']);
             if (isset($arNew['entity'])) unset($arNew['entity']);
-            if (isset($arNew['created_at'])) unset($arNew['created_at']);
-            if (isset($arNew['modified_at'])) unset($arNew['modified_at']);
 
             // print_r($arNew);
 

@@ -536,7 +536,7 @@ class SimpleMysql {
      * READ Secondary Data
      *
      */
-    public function readSecondaryData($table, $keyColumn, $keyValue, $selectColumns = array(), $onlyActive = false, $table = null)
+    public function readSecondaryData($table, $keyColumn, $keyValue, $selectColumns = array(), $onlyActive = false)
     {
         $table = !$table ? $this->table : $table;
 

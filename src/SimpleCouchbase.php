@@ -156,7 +156,7 @@ class SimpleCouchbase {
         }
     }
 
-    public function createPrimaryIndex($index='admin_fly_primary_index', $bucket='admin_fly')
+    public function createPrimaryIndex($index='primary_index', $bucket='default')
     {
         try {
             $queryI = CouchbaseN1qlQuery::fromString("CREATE PRIMARY INDEX `$index` ON `$bucket` USING GSI;");
@@ -182,12 +182,12 @@ class SimpleCouchbase {
             $n = 0;
 
             foreach ($resultS as $row) {
-                if (isset($row->admin_fly->uuid)) {
+                if (isset($row->$bucket->uuid)) {
                     $json = json_encode($row, JSON_UNESCAPED_SLASHES);
 
-                    echo $n++.": ".$row->admin_fly->uuid."\n";
+                    echo $n++.": ".$row->$bucket->uuid."\n";
 
-                    file_put_contents($folder.'/'.$row->admin_fly->uuid.'.json', $json);
+                    file_put_contents($folder.'/'.$row->$bucket->uuid.'.json', $json);
                 } else {
                     $json = json_encode($row, JSON_UNESCAPED_SLASHES);
 

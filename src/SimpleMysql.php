@@ -13,7 +13,7 @@ class SimpleMysql {
 
     public $table;
 
-    public $charset;
+    public $charset = 'utf8';
 
     /**
      * @param object $link
@@ -30,9 +30,7 @@ class SimpleMysql {
 
         } else if (!empty($options)) {
             if (isset($this->host)) $this->hostname = $this->host;
-            if (isset($this->dbname)) $this->database = $this->dbname;
 
-            //$this->link = @mysqli_connect($this->hostname, $this->username, $this->password, $this->database);
             $this->link = mysqli_init();
             mysqli_options($this->link, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
@@ -42,8 +40,9 @@ class SimpleMysql {
 
                 $charset = "SET CHARSET '".$this->charset."';";
                 mysqli_query($this->link, $charset);
-            } else
+            } else {
                 $this->link = false;
+            }
         }
     }
 
@@ -186,6 +185,56 @@ class SimpleMysql {
     }
 
     /**
+     * CREATE Row with Eav
+     *
+     */
+    public function createRowwithEav($params, $replace = false, $table = null, $key_id = null)
+    {
+        $table = $table ? $table : $this->table;
+
+        $columns = $this->getColumns($table);
+
+        foreach ($columns as $column) {
+            $arColumns[] = $column['Field'];
+        }
+
+        // print_r($arColumns);
+
+        if ($params)
+            foreach ($params as $key => $value) {
+                $value = is_array($value) ? json_encode($value) : $value;
+
+                if (strstr($key, "eav_")) {
+                    $eav[$key] = $value;
+                } else if (!in_array($key, $arColumns)) {
+                    $eav[$key] = $value;
+                } else {
+                    $keys[] = $key;
+                    $values[] = mysqli_escape_string($this->link, $value);
+                }
+            }
+
+        $sql = ($replace ? "REPLACE" : "INSERT") . " INTO ".$this->database.".".$table." (`".implode('`,`', $keys)."`) VALUES ('".implode("','", $values)."')";
+        // echo $sql."\n";
+        $this->query($sql);
+
+        $lastId = $this->getLastInsertID();
+
+        if (isset($lastId) && $lastId > 0) {
+            if (isset($eav) && $eav) {
+                foreach ($eav as $key => $value) {
+                    $sql =  "INSERT INTO ".$this->database.".".$table."_eav (`".$key_id."`, `Attribute`, `Value`) VALUES ($lastId, '$key', '$value')";
+                    // echo $sql."\n";
+                    $this->query($sql);
+                }
+            }
+
+        }
+
+        return $lastId;
+    }
+
+    /**
      * INSERT Replace Row
      *
      */
@@ -219,11 +268,16 @@ class SimpleMysql {
      * READ Row
      *
      */
-    public function readRow($id, $table = null)
+    public function readRow($id, $table = null, $pk = null)
     {
         $table = $table ? $table : $this->table;
 
-        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$table."_id = '" . $id . "'";
+        if (!$pk) {
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$table."_id = '" . $id . "'";    
+        } else  {
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$pk." = '" . $id . "'";
+        }
+        
         return $this->query($sql);
     }
 
@@ -318,15 +372,16 @@ class SimpleMysql {
      * READ ALL Rows
      *
      */
-    public function readAllRows($start=0, $size=30000000, $priority=0, $table = null)
+    public function readAllRows($start=0, $size=30000000, $priority=0, $table = null, $orderby = null)
     {
         $table = !$table ? $this->table : $table;
 
         if ($priority > 0) {
-            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND priority >= $priority LIMIT $start, $size";
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND priority >= $priority $orderby LIMIT $start, $size";
         } else {
-            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 LIMIT $start, $size";
+            $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 $orderby LIMIT $start, $size";
         }
+
         return $this->query($sql);
     }
 
@@ -444,6 +499,17 @@ class SimpleMysql {
     }
 
     /**
+     * READ All Eav Data
+     *
+     */
+    public function readAllEavData($table, $key, $id)
+    {
+        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND ".$key." = $id";
+        // echo $sql;
+        return $this->query($sql);
+    }
+
+    /**
      * READ All Other
      *
      */
@@ -470,7 +536,7 @@ class SimpleMysql {
      * READ Secondary Data
      *
      */
-    public function readSecondaryData($table, $keyColumn, $keyValue, $selectColumns = array(), $onlyActive = false, $table = null)
+    public function readSecondaryData($table, $keyColumn, $keyValue, $selectColumns = array(), $onlyActive = false)
     {
         $table = !$table ? $this->table : $table;
 

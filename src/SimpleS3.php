@@ -48,6 +48,17 @@ class SimpleS3 {
         return $result;
     }
 
+    public function getObject($bucket, $key)
+    {
+        // Get an object.
+        $result = $this->client->getObject(array(
+            'Bucket' => $bucket,
+            'Key'    => $key
+        ));
+
+        return $result;
+    }
+    
     public function putObject($bucket, $key, $body)
     {
         // Upload an object to Amazon S3

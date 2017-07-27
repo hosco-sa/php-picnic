@@ -51,10 +51,12 @@ class SimpleCouchbase {
     {
         try {
 
-            foreach ($value as $k => $v) {
-                if (is_string($v)) {
-                    if (mb_detect_encoding($v) != 'UTF-8') {
-                        $value[$k] = utf8_encode($v);
+            if (is_array($value)) {
+                foreach ($value as $k => $v) {
+                    if (is_string($v)) {
+                        if (mb_detect_encoding($v) != 'UTF-8') {
+                            $value[$k] = utf8_encode($v);
+                        }
                     }
                 }
             }

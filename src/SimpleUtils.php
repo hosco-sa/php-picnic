@@ -161,7 +161,7 @@ class SimpleUtils {
         fclose($fp);
     }
 
-    public static function curl_request($url, $type="GET", $json=false)
+    public static function curl_request($url, $type="GET", $json=false, $headers=array('Accept: application/json'))
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -172,14 +172,14 @@ class SimpleUtils {
         curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $rawdata = curl_exec ($ch);
         curl_close ($ch);
 
         return $rawdata;
     }
 
-    public static function curl_request_xml($url, $type="GET", $xml=false)
+    public static function curl_request_xml($url, $type="GET", $xml=false, $headers=array('Content-Type: application/xml'))
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -190,7 +190,7 @@ class SimpleUtils {
         curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $rawdata = curl_exec ($ch);
         curl_close ($ch);
 

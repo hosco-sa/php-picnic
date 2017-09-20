@@ -172,24 +172,23 @@ class SimpleCouchbase {
         }
     }
 
-    public function dumpAllKeys($bucket, $limit=1000, $offset=0, $folder='storage')
+    public function dumpAllKeys($bucket, $limit=1000, $offset=0, $id='uuid', $folder='storage')
     {
         try {
             $queryS = CouchbaseN1qlQuery::fromString("SELECT * FROM `$bucket` LIMIT $limit OFFSET $offset");
 
             $resultS = $this->cluster->openBucket($this->bucket)->query($queryS);
 
-            // print_r($resultS);
-
             $n = 0;
 
-            foreach ($resultS as $row) {
-                if (isset($row->$bucket->uuid)) {
-                    $json = json_encode($row, JSON_UNESCAPED_SLASHES);
+            foreach ($resultS->rows as $row) {
 
-                    echo $n++.": ".$row->$bucket->uuid."\n";
+                if (isset($row->$bucket->$id)) {
+                    $json = json_encode($row->$bucket, JSON_UNESCAPED_SLASHES);
 
-                    file_put_contents($folder.'/'.$row->$bucket->uuid.'.json', $json);
+                    echo $n++.": ".$row->$bucket->$id."\n";
+
+                    file_put_contents($folder.'/'.$row->$bucket->$id.'.json', $json);
                 } else {
                     $json = json_encode($row, JSON_UNESCAPED_SLASHES);
 
@@ -200,7 +199,6 @@ class SimpleCouchbase {
         } catch (CouchbaseException $e) {
             echo $e->getMessage()."\n";
         }
-
-
     }
+
 }

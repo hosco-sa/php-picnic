@@ -13,7 +13,7 @@ class SimpleCouchbase {
 
     public function __construct($params)
     {
-        $this->cluster = new \CouchbaseCluster("couchbase://".$params['host']);
+        $this->cluster = new \CouchbaseCluster("couchbase://".$params['host']."?operation_timeout=5");
 
         if ($params['bucket']) {
             $this->bucket = $params['bucket'];

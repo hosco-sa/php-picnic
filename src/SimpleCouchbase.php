@@ -181,7 +181,13 @@ class SimpleCouchbase {
 
             $n = 0;
 
-            foreach ($resultS->rows as $row) {
+	    // print_r($resultS); die;
+
+	    if (isset($resultS->rows)) {
+		$resultS = $resultS->rows;
+	    }
+
+            foreach ($resultS as $row) {
 
                 if (isset($row->$bucket->$id)) {
                     $json = json_encode($row->$bucket, JSON_UNESCAPED_SLASHES);

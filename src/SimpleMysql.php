@@ -631,6 +631,18 @@ class SimpleMysql {
         $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND `$att` LIKE '%$val%'";
         return $this->query($sql);
     }
+
+    /**
+     * READ By Exact Attribute Value
+     *
+     */
+    public function readByExactAttributeValue($att, $val, $table = null)
+    {
+        $table = !$table ? $this->table : $table;
+
+        $sql = "SELECT * FROM ".$this->database.".".$table." WHERE 1 AND `$att` = '$val'";
+        return $this->query($sql);
+    }
     
     /**
      * QUERY

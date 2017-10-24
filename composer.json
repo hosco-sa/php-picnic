@@ -1,7 +1,7 @@
 {
   "name": "dvpablo/php-picnic",
   "description": "Picnic (Simple) PHP libraries to connect to persistent layers like Cassandra, Couchbase, Couchdb, ElasticSearch, Kinesis, Mysql and AWS S3.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "authors": [
     {
       "name": "Pablo del Vecchio",

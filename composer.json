@@ -8,7 +8,7 @@
       "email": "dvpablo@yahoo.com"
     }
   ],
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "require": {
     "php": ">=5.6.0",
     "aws/aws-sdk-php": "2.*",

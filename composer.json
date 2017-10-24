@@ -8,7 +8,6 @@
       "email": "dvpablo@yahoo.com"
     }
   ],
-  "minimum-stability": "dev",
   "extra": {
     "branch-alias": {
       "dev-master": "0.2.x-dev"

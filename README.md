@@ -1,19 +1,10 @@
 # php-picnic
 
-Picnic (Simple) PHP libraries to connect to services like ElasticSearch, Couchbase, S3, Mysql.
+Picnic (Simple) PHP libraries to connect to persistent layers like Cassandra, Couchbase, Couchdb, ElasticSearch, Kinesis, Mysql and AWS S3.
 
 
-## 0.0.3
-*2016-02-23 | Pablo del Vecchio
 
-- added more simple functions
+### 0.0.1
+2016-02-23 | Pablo del Vecchio
 
-## 0.0.2
-*2016-02-23 | Pablo del Vecchio
-
-- added S3 support
-
-## 0.0.1
-*2016-02-23 | Pablo del Vecchio
-
-- first commit
+- Initial commit

@@ -81,6 +81,17 @@ class SimpleElasticsearch {
         return $this->client->search($params);
     }
 
+    public function count($index, $body, $type=0)
+    {
+        $params = [
+            'index' => $index,
+            'type' => $type,
+            'body' => $body
+        ];
+
+        return $this->client->count($params);
+    }
+
     public function truncateIndex($index)
     {
         $this->deleteIndex($index);

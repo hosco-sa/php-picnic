@@ -141,4 +141,11 @@ class SimpleS3 {
         }
     }
 
+    public function exists($bucket, $key)
+    {
+        $response = $this->client->doesObjectExist($bucket, $key);
+
+        return $response;
+    }
+
 }

@@ -207,4 +207,38 @@ class SimpleCouchbase {
         }
     }
 
+    public function dumpAllKeysWithPrefix($bucket, $limit=1000, $offset=0, $id='uuid', $folder='storage', $prefix='0')
+    {
+        try {
+            $queryS = CouchbaseN1qlQuery::fromString("SELECT * FROM `$bucket` WHERE $id LIKE '$prefix%' LIMIT $limit OFFSET $offset");
+
+            $resultS = $this->cluster->openBucket($this->bucket)->query($queryS);
+
+            $n = 0;
+
+            // print_r($resultS); die;
+
+            if (isset($resultS->rows)) {
+                $resultS = $resultS->rows;
+            }
+
+            foreach ($resultS as $row) {
+
+                if (isset($row->$bucket->$id)) {
+                    $json = json_encode($row->$bucket, JSON_UNESCAPED_SLASHES);
+
+                    echo $n++.": ".$row->$bucket->$id."\n";
+
+                    file_put_contents($folder.'/'.substr($row->$bucket->$id,0,1).'/'.$row->$bucket->$id.'.json', $json);
+                } else {
+                    $json = json_encode($row, JSON_UNESCAPED_SLASHES);
+
+                    echo $json."\n";
+                }
+            }
+
+        } catch (CouchbaseException $e) {
+            echo $e->getMessage()."\n";
+        }
+    }
 }

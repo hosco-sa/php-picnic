@@ -92,6 +92,29 @@ class SimpleElasticsearch {
         return $this->client->count($params);
     }
 
+    public function scan($index, $body, $size=100)
+    {
+        $params = [
+            "search_type" => "scan",
+            "scroll" => "10s",
+            "size" => $size,
+            "index" => $index,
+            "body" => $body
+        ];
+
+        return $this->client->search($params);
+    }
+
+    public function scroll($scrollId)
+    {
+        $params = [
+            "scroll_id" => "$scrollId",
+            "scroll" => "10s"
+        ];
+
+        return $this->client->scroll($params);
+    }
+
     public function truncateIndex($index)
     {
         $this->deleteIndex($index);

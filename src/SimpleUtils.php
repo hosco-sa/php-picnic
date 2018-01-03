@@ -283,6 +283,14 @@ class SimpleUtils {
         $str = str_replace("Ò", "O", $str);
         $str = str_replace("Ù", "U", $str);
 
+        $str = str_replace("ñ", "n", $str);
+        $str = str_replace("Ñ", "n", $str);
+
+        $str = str_replace("ç", "c", $str);
+        $str = str_replace("Ç", "c", $str);
+
+        $str = addslashes($str);
+
         return $str;
     }
 }

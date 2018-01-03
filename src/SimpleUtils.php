@@ -256,4 +256,33 @@ class SimpleUtils {
         }
         return $headers;
     }
+
+    public static function normalize_chars($str)
+    {
+        $str = str_replace("á", "a", $str);
+        $str = str_replace("é", "e", $str);
+        $str = str_replace("í", "i", $str);
+        $str = str_replace("ó", "o", $str);
+        $str = str_replace("ú", "u", $str);
+
+        $str = str_replace("à", "a", $str);
+        $str = str_replace("è", "e", $str);
+        $str = str_replace("ì", "i", $str);
+        $str = str_replace("ò", "o", $str);
+        $str = str_replace("ù", "u", $str);
+
+        $str = str_replace("Á", "A", $str);
+        $str = str_replace("É", "E", $str);
+        $str = str_replace("Í", "I", $str);
+        $str = str_replace("Ó", "O", $str);
+        $str = str_replace("Ú", "U", $str);
+
+        $str = str_replace("À", "A", $str);
+        $str = str_replace("È", "E", $str);
+        $str = str_replace("Ì", "I", $str);
+        $str = str_replace("Ò", "O", $str);
+        $str = str_replace("Ù", "U", $str);
+
+        return $str;
+    }
 }

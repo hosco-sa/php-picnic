@@ -326,6 +326,24 @@ class SimpleUtils {
         $str = str_replace("u00e7", "ç", $str);
         $str = str_replace("u00c7", "Ç", $str);
 
+        $str = str_replace("00e2", "â", $str);
+        $str = str_replace("00e3", "ã", $str);
+        $str = str_replace("00e4", "ä", $str);
+        $str = str_replace("00e5", "å", $str);
+
+        $str = str_replace("00ea", "ê", $str);
+        $str = str_replace("00eb", "ë", $str);
+
+        $str = str_replace("00ee", "î", $str);
+        $str = str_replace("00ef", "ï", $str);
+
+        $str = str_replace("00f4", "ô", $str);
+        $str = str_replace("00f5", "õ", $str);
+        $str = str_replace("00f6", "ö", $str);
+
+        $str = str_replace("00fb", "û", $str);
+        $str = str_replace("00fc", "ü", $str);
+
         return $str;
     }
 

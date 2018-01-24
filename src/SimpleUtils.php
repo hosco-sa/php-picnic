@@ -293,4 +293,40 @@ class SimpleUtils {
 
         return $str;
     }
+
+    public static function unicode_chars($str)
+    {
+        $str = str_replace("u00e1", "á", $str);
+        $str = str_replace("u00e9", "é", $str);
+        $str = str_replace("u00ed", "í", $str);
+        $str = str_replace("u00f3", "ó", $str);
+        $str = str_replace("u00fa", "ú", $str);
+
+        $str = str_replace("u00e0", "à", $str);
+        $str = str_replace("u00e8", "è", $str);
+        $str = str_replace("u00ec", "ì", $str);
+        $str = str_replace("u00f2", "ò", $str);
+        $str = str_replace("u00f9", "ù", $str);
+
+        $str = str_replace("u00c1", "Á", $str);
+        $str = str_replace("u00c9", "É", $str);
+        $str = str_replace("u00cd", "Í", $str);
+        $str = str_replace("u00d3", "Ó", $str);
+        $str = str_replace("u00da", "Ú", $str);
+
+        $str = str_replace("u00c0", "À", $str);
+        $str = str_replace("u00c8", "È", $str);
+        $str = str_replace("u00cc", "Ì", $str);
+        $str = str_replace("u00d2", "Ò", $str);
+        $str = str_replace("u00d9", "Ù", $str);
+
+        $str = str_replace("u00f1", "ñ", $str);
+        $str = str_replace("u00d1", "Ñ", $str);
+
+        $str = str_replace("u00e7", "ç", $str);
+        $str = str_replace("u00c7", "Ç", $str);
+
+        return $str;
+    }
+
 }

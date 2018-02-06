@@ -1,6 +1,6 @@
 # php-picnic
 
-Picnic (Simple) PHP libraries to connect to persistent layers like Cassandra, Couchbase, Couchdb, ElasticSearch, Kinesis, Mysql and AWS S3.
+Picnic (Simple) PHP libraries to connect to persistent layers like Cassandra, Couchbase, Couchdb, Mongo, ElasticSearch, Kinesis, Mysql and AWS S3.
 
 
 

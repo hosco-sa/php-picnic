@@ -79,7 +79,7 @@ class SimpleMongo {
         return $count;
     }
 
-    public function getByAttVal($database, $collection, $att, $val)
+    public function getOneByAttVal($database, $collection, $att, $val)
     {
         try {
             $doc = $this->client->$database->$collection->findOne([$att => $val]);

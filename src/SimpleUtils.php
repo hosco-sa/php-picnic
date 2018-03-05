@@ -344,6 +344,8 @@ class SimpleUtils {
         $str = str_replace("00fb", "û", $str);
         $str = str_replace("00fc", "ü", $str);
 
+        $str = str_replace("u00bf", "¿", $str);
+
         return $str;
     }
 

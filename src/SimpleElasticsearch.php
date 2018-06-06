@@ -70,6 +70,13 @@ class SimpleElasticsearch {
         return $this->client->delete($params);
     }
 
+    public function deleteByQuery($host, $index, $body, $type=0)
+    {
+        $endpoint = "$host/$index/$type/_delete_by_query";
+
+        return SimpleUtils::curl_request($endpoint, 'POST', $body);
+    }
+
     public function search($index, $body, $type=0)
     {
         $params = [
@@ -120,5 +127,14 @@ class SimpleElasticsearch {
         $this->deleteIndex($index);
 
         return $this->createIndex($index, 5, 1);
+    }
+
+    public function curlRequest($endpoint, $method, $data)
+    {
+        print_r($this->client);
+
+        $url = "http://".$host.":".$port."/".$this->app['elasticsearch_conn']['index']."/_search";
+
+        return SimpleUtils::curl_request($endpoint, $method, $json_data);
     }
 }

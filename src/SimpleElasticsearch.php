@@ -48,6 +48,42 @@ class SimpleElasticsearch {
         return $this->client->index($params);
     }
 
+    public function bulk($index, $docs, $type=0, $extra=0)
+    {
+        $params = ['body' => []];
+
+        $i = 0;
+
+        foreach ($docs as $body) {
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $index,
+                    '_type' => $type,
+                    '_id' => md5($_SERVER['REMOTE_ADDR']."-".$extra."-".$body['ID_USER']),
+                ]
+            ];
+
+            $params['body'][] = $body;
+
+            // Every 100 documents stop and send the bulk request
+            if ($i % 100 == 0) {
+                $response = $this->client->bulk($params);
+
+                // erase the old bulk request
+                $params = ['body' => []];
+            }
+
+            $i++;
+        }
+
+        // Send the last batch if it exists
+        if (!empty($params['body'])) {
+            $response = $this->client->bulk($params);
+        }
+
+        return $response;
+    }
+
     public function get($index, $id, $type=0)
     {
         $params = [
@@ -135,6 +171,6 @@ class SimpleElasticsearch {
 
         $url = "http://".$host.":".$port."/".$this->app['elasticsearch_conn']['index']."/_search";
 
-        return SimpleUtils::curl_request($endpoint, $method, $json_data);
+        return SimpleUtils::curl_request($endpoint, $method, $data);
     }
 }

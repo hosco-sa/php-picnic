@@ -9,6 +9,7 @@ class SimpleMysql {
     public $hostname;
     public $username;
     public $password;
+    public $portnumber;
     public $database;
 
     public $table;
@@ -25,6 +26,10 @@ class SimpleMysql {
             $this->$key = $value;
         }
 
+        if (!isset($this->portnumber) || $this->portnumber == '') {
+            $this->portnumber = 3306;
+        }
+
         if ($link) {
             $this->link = $link;
 
@@ -34,7 +39,7 @@ class SimpleMysql {
             $this->link = mysqli_init();
             mysqli_options($this->link, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
-            if (@mysqli_real_connect($this->link, $this->hostname, $this->username, $this->password, $this->database)) {
+            if (@mysqli_real_connect($this->link, $this->hostname, $this->username, $this->password, $this->database, $this->portnumber)) {
                 $names = "SET NAMES '".$this->charset."';";
                 mysqli_query($this->link, $names);
 

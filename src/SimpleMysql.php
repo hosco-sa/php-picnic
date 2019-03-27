@@ -655,8 +655,6 @@ class SimpleMysql {
      */
     public function query($sql, $firstColAsKey = false, $resultMode = MYSQLI_STORE_RESULT)
     {
-        // echo $sql."\n";
-
         $res = mysqli_query($this->link, $sql, $resultMode);
 
         if (!$res) {
@@ -677,6 +675,66 @@ class SimpleMysql {
             return $arRows;
         } else {
             return $res;
+        }
+    }
+
+    /**
+     * PREPARED QUERY
+     *
+     */
+    public function preparedQuery($sql, $aParamType, $aBindParams, $firstColAsKey = false, $resultMode = MYSQLI_STORE_RESULT)
+    {
+        $aParams = [];
+
+        $paramType = '';
+
+        $n = count($aParamType);
+
+        for($i = 0; $i < $n; $i++) {
+            $paramType .= $aParamType[$i];
+        }
+
+        $aParams[] = &$paramType;
+
+        for($i = 0; $i < $n; $i++) {
+            $aParams[] = & $aBindParams[$i];
+        }
+
+        $stmt = $this->link->prepare($sql);
+
+        if ($stmt === false) {
+            return mysqli_error($this->link);
+        }
+
+        try {
+            call_user_func_array(array($stmt, 'bind_param'), $aParams);
+
+            $stmt->execute();
+
+            $res = $stmt->get_result();
+
+            if (!isset($res) || !$res) {
+                return mysqli_error($this->link);
+            }
+
+            $arRows = array();
+
+            if (!is_bool($res) && (strstr($sql, "SELECT ") || strstr($sql, "SHOW "))) {
+                while ($row = mysqli_fetch_assoc($res)) {
+                    if ($firstColAsKey) {
+                        $arRows[current($row)] = $row;
+                    } else {
+                        $arRows[] = $row;
+                    }
+                }
+
+                return $arRows;
+            } else {
+                return $res;
+            }
+
+        } catch (\Exception $e) {
+            echo $e->getMessage();
         }
     }
 

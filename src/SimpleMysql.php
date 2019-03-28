@@ -679,10 +679,25 @@ class SimpleMysql {
     }
 
     /**
+     * PREPARED STMT
+     *
+     */
+    public function preparedStmt($sql)
+    {
+        try {
+            $stmt = $this->link->prepare($sql);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return $stmt;
+    }
+
+    /**
      * PREPARED QUERY
      *
      */
-    public function preparedQuery($sql, $aParamType, $aBindParams, $firstColAsKey = false, $resultMode = MYSQLI_STORE_RESULT)
+    public function preparedQuery($stmt, $aParamType, $aBindParams, $firstColAsKey = false, $resultMode = MYSQLI_STORE_RESULT)
     {
         $aParams = [];
 
@@ -698,12 +713,6 @@ class SimpleMysql {
 
         for($i = 0; $i < $n; $i++) {
             $aParams[] = & $aBindParams[$i];
-        }
-
-        $stmt = $this->link->prepare($sql);
-
-        if ($stmt === false) {
-            return mysqli_error($this->link);
         }
 
         try {

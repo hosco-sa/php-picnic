@@ -11,9 +11,15 @@ class SimpleCouchbase {
     public $cluster;
     public $bucket;
 
+    /**
+     * CONSTRUCTOR
+     *
+     * @param $params
+     */
     public function __construct($params)
     {
-        $this->cluster = new \CouchbaseCluster("couchbase://".$params['host']."?operation_timeout=5");
+        $this->cluster = new \CouchbaseCluster("couchbase://{$params['host']}?operation_timeout=5");
+        $this->cluster->authenticateAs($params['user'], $params['pass']);
 
         if ($params['bucket']) {
             $this->bucket = $params['bucket'];
@@ -21,6 +27,13 @@ class SimpleCouchbase {
         }
     }
 
+    /**
+     * CREATE Bucket
+     *
+     * @param $bucket
+     * @param $attributes
+     * @return bool
+     */
     public function createBucket($bucket, $attributes)
     {
         try {
@@ -34,6 +47,12 @@ class SimpleCouchbase {
 
     }
 
+    /**
+     * GET Document
+     *
+     * @param $key
+     * @return array|bool|\Couchbase\Document
+     */
     public function getDocument($key)
     {
         try {
@@ -47,7 +66,15 @@ class SimpleCouchbase {
         }
     }
 
-    public function setDocument($key, $value)
+    /**
+     * SET Document
+     *
+     * @param $key
+     * @param $value
+     * @param array $options
+     * @return array|bool|\Couchbase\Document
+     */
+    public function setDocument($key, $value, $options=[])
     {
         try {
 
@@ -65,7 +92,7 @@ class SimpleCouchbase {
 
             if (SimpleUtils::is_json($json)) {
 
-                $res = $this->cluster->openBucket($this->bucket)->upsert($key, $value);
+                $res = $this->cluster->openBucket($this->bucket)->upsert($key, $value, $options);
 
                 return $res;
             }
@@ -77,6 +104,13 @@ class SimpleCouchbase {
         }
     }
 
+    /**
+     * SET Partial Document
+     *
+     * @param $key
+     * @param $value
+     * @return array|bool|\Couchbase\Document
+     */
     public function setPartialDocument($key, $value)
     {
         try {
@@ -118,7 +152,13 @@ class SimpleCouchbase {
 
         }
     }
-    
+
+    /**
+     * DELETE Document
+     *
+     * @param $key
+     * @return array|bool|\Couchbase\Document
+     */
     public function delDocument($key)
     {
         try {
@@ -135,29 +175,12 @@ class SimpleCouchbase {
         }
     }
 
-    public function dumpAllKeysBeerSample()
-    {
-        // $queryI = CouchbaseN1qlQuery::fromString('CREATE PRIMARY INDEX `beer-sample-primary-index` ON `beer-sample` USING GSI;');
-
-        // $resultI = $this->cluster->openBucket($this->bucket)->query($queryI);
-
-        // print_r($resultI);
-
-        $queryS = CouchbaseN1qlQuery::fromString('SELECT * FROM `beer-sample` LIMIT 10');
-
-        $resultS = $this->cluster->openBucket($this->bucket)->query($queryS);
-
-        // print_r($resultS);
-
-        foreach ($resultS as $row) {
-            // print_r($row);
-
-            $json = json_encode($row, JSON_UNESCAPED_SLASHES);
-
-            echo $json."\n";
-        }
-    }
-
+    /**
+     * CREATE PRIMARY INDEX
+     *
+     * @param string $index
+     * @param string $bucket
+     */
     public function createPrimaryIndex($index='primary_index', $bucket='default')
     {
         try {
@@ -172,6 +195,15 @@ class SimpleCouchbase {
         }
     }
 
+    /**
+     * DUMP ALL KEYS
+     *
+     * @param $bucket
+     * @param int $limit
+     * @param int $offset
+     * @param string $id
+     * @param string $folder
+     */
     public function dumpAllKeys($bucket, $limit=1000, $offset=0, $id='uuid', $folder='storage')
     {
         try {
@@ -207,6 +239,16 @@ class SimpleCouchbase {
         }
     }
 
+    /**
+     * DUMP ALL KEYS w/ prefix
+     *
+     * @param $bucket
+     * @param int $limit
+     * @param int $offset
+     * @param string $id
+     * @param string $folder
+     * @param string $prefix
+     */
     public function dumpAllKeysWithPrefix($bucket, $limit=1000, $offset=0, $id='uuid', $folder='storage', $prefix='0')
     {
         try {
